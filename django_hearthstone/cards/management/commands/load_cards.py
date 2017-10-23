@@ -24,7 +24,7 @@ class Command(BaseCommand):
 		self.stdout.write("%i new cards" % (len(new_cards)))
 
 		if options["force"]:
-			existing = Card.objects.filter(id__in=known_ids)
+			existing = Card.objects.filter(card_id__in=known_ids)
 			for card in existing:
 				if card.card_id not in db:
 					self.stderr.write(
