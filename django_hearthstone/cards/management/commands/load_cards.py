@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from hearthstone import cardxml
+
 from ...models import Card
 
 

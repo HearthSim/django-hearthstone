@@ -1,5 +1,6 @@
 import pytest
 from django.core.management import call_command
+
 from django_hearthstone.cards.models import Card
 
 
