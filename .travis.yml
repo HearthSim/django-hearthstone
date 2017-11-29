@@ -5,19 +5,15 @@ language: python
 python: "3.6"
 
 env:
+  - TOXENV=py36-django111
+  - TOXENV=py36-djangomaster
   - TOXENV=flake8
 
 matrix:
   fast_finish: true
 
 install:
-  - pip install --upgrade pip setuptools wheel
   - pip install tox
 
 script:
   - tox
-
-notifications:
-  email:
-    on_failure: always
-    on_success: change
