@@ -9,6 +9,11 @@ env:
   - TOXENV=py36-djangomaster
   - TOXENV=flake8
 
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $TRAVIS_BUILD_DIR/.tox
+
 matrix:
   fast_finish: true
 
