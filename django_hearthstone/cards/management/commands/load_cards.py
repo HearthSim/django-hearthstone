@@ -12,10 +12,10 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		path = options["path"]
-		db, _ = cardxml.load(path, locale=options["locale"])
+		db, _ = cardxml.load_dbf(path, locale=options["locale"])
 		self.stdout.write("%i cards available" % (len(db)))
 
-		qs = Card.objects.all().values_list("card_id")
+		qs = Card.objects.all().values_list("dbf_id")
 		known_ids = [item[0] for item in qs]
 		missing = [id for id in db if id not in known_ids]
 		self.stdout.write("%i known cards" % (len(known_ids)))
@@ -25,14 +25,14 @@ class Command(BaseCommand):
 		self.stdout.write("%i new cards" % (len(new_cards)))
 
 		if options["force"]:
-			existing = Card.objects.filter(card_id__in=known_ids)
+			existing = Card.objects.filter(dbf_id__in=known_ids)
 			for card in existing:
-				if card.card_id not in db:
+				if card.dbf_id not in db:
 					self.stderr.write(
-						"WARNING: %r (%s) not in CardDefs.xml. Skipping." % (card, card.card_id)
+						"WARNING: %r (%s) not in CardDefs.xml. Skipping." % (card, card.dbf_id)
 					)
 					continue
-				c = db[card.card_id]
+				c = db[card.dbf_id]
 				if c:
 					card.update_from_cardxml(c, save=True)
 			self.stdout.write("%i updated cards" % (len(existing)))
