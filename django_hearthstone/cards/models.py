@@ -95,9 +95,15 @@ class Card(models.Model):
 	def get_tile_url(self, format="png"):
 		return "https://art.hearthstonejson.com/v1/tiles/%s.%s" % (self.id, format)
 
+	def localized_name(self, locale) -> str:
+		try:
+			return self.strings.get(locale=locale, game_tag=enums.GameTag.CARDNAME).value
+		except CardString.DoesNotExist:
+			return ""
+
 	def update_from_cardxml(self, cardxml, save=False):
 		for k in dir(cardxml):
-			if k.startswith("_") or k == "id":
+			if k.startswith("_") or k in ("id", "tags", "strings"):
 				continue
 			# Transfer all existing CardXML attributes to our model
 			if hasattr(self, k):

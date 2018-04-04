@@ -1,7 +1,9 @@
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from hearthstone import cardxml
+from hearthstone.enums import Locale
 
-from ...models import Card
+from ...models import Card, CardString, CardTag
 
 
 class Command(BaseCommand):
@@ -36,3 +38,27 @@ class Command(BaseCommand):
 				if c:
 					card.update_from_cardxml(c, save=True)
 			self.stdout.write("%i updated cards" % (len(existing)))
+
+		tags = []
+		for dbf_id, card in db.items():
+			for tag, value in card.tags.items():
+				tags.append(CardTag(card_id=dbf_id, game_tag=tag, value=value))
+
+		locstrings = []
+		for dbf_id, card in db.items():
+			for tag, locstring in card.strings.items():
+				if isinstance(locstring, str):
+					# (non-localized string)
+					continue
+				for locale, value in locstring.items():
+					locale = Locale[locale]
+					locstrings.append(CardString(
+						card_id=dbf_id, locale=locale, game_tag=tag, value=value
+					))
+
+		with transaction.atomic():
+			CardTag.objects.all().delete()
+			CardString.objects.all().delete()
+
+			CardTag.objects.bulk_create(tags)
+			CardString.objects.bulk_create(locstrings)
