@@ -105,3 +105,28 @@ class Card(models.Model):
 
 		if save:
 			self.save()
+
+
+class CardTag(models.Model):
+	card = models.ForeignKey(
+		"Card", to_field="dbf_id", db_column="card_dbf_id", related_name="tags",
+		on_delete=models.CASCADE
+	)
+	game_tag = IntEnumField(enum=enums.GameTag, db_index=True)
+	value = models.PositiveIntegerField()
+
+	def __str__(self):
+		return f"{str(self.card)}.{self.game_tag.name}={str(self.value)}"
+
+
+class CardString(models.Model):
+	card = models.ForeignKey(
+		"Card", to_field="dbf_id", db_column="card_dbf_id", related_name="strings",
+		on_delete=models.CASCADE
+	)
+	locale = IntEnumField(enum=enums.Locale, db_index=True)
+	game_tag = IntEnumField(enum=enums.GameTag, db_index=True)
+	value = models.TextField(blank=True)
+
+	def __str__(self):
+		return self.value
