@@ -9,8 +9,8 @@ DBF_DB = {}
 
 
 class Card(models.Model):
-	card_id = models.CharField(primary_key=True, max_length=50)
-	dbf_id = models.IntegerField(null=True, unique=True, db_index=True)
+	dbf_id = models.PositiveIntegerField(primary_key=True)
+	card_id = models.CharField(max_length=50, unique=True, db_index=True)
 
 	name = models.CharField(max_length=50)
 	description = models.TextField(blank=True)
