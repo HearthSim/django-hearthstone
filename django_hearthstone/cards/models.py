@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 from django_intenum import IntEnumField
 from hearthstone import cardxml, enums
@@ -78,6 +79,10 @@ class Card(models.Model):
 	@property
 	def slug(self):
 		return slugify(self.name)
+
+	def get_absolute_url(self):
+		# XXX
+		return reverse("card_detail", kwargs={"pk": self.dbf_id, "slug": self.slug})
 
 	def get_card_art_url(self, resolution=256, format="jpg"):
 		return "https://art.hearthstonejson.com/v1/%ix/%s.%s" % (resolution, self.id, format)
