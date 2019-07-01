@@ -11,7 +11,7 @@ class Card(models.Model):
 	dbf_id = models.PositiveIntegerField(primary_key=True)
 	card_id = models.CharField(max_length=50, unique=True, db_index=True)
 
-	name = models.CharField(max_length=50)
+	name = models.CharField(max_length=64)
 	description = models.TextField(blank=True)
 	flavortext = models.TextField(blank=True)
 	how_to_earn = models.TextField(blank=True)
