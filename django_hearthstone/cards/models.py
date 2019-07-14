@@ -8,6 +8,21 @@ from hearthstone import cardxml, enums
 DBF_DB = {}
 
 
+class IncludibleCardManager(models.Manager):
+	def get_queryset(self):
+		return super().get_queryset().filter(
+			models.Q(collectible=True),
+			models.Q(type__in=[
+				enums.CardType.MINION,
+				enums.CardType.SPELL,
+				enums.CardType.WEAPON
+			]) | (
+				models.Q(type=enums.CardType.HERO) &
+				~models.Q(card_set__in=[enums.CardSet.CORE, enums.CardSet.HERO_SKINS])
+			)
+		)
+
+
 class Card(models.Model):
 	card_id = models.CharField(primary_key=True, max_length=50)
 	dbf_id = models.IntegerField(null=True, unique=True, db_index=True)
@@ -52,6 +67,9 @@ class Card(models.Model):
 	spell_damage = models.IntegerField(default=0)
 
 	craftable = models.BooleanField(default=False)
+
+	objects = models.Manager()
+	includibles = IncludibleCardManager()
 
 	class Meta:
 		db_table = "card"
@@ -111,6 +129,20 @@ class Card(models.Model):
 
 		if save:
 			self.save()
+
+	@property
+	def playable(self):
+		"""Returns whether the card can be played."""
+		if self.type in [enums.CardType.MINION, enums.CardType.SPELL, enums.CardType.WEAPON]:
+			return True
+		# Heroes can only be played if they are not the basic heroes or hero skins.
+		if self.type == enums.CardType.HERO:
+			return self.card_set not in [enums.CardSet.CORE, enums.CardSet.HERO_SKINS]
+		return False
+
+	@property
+	def includible(self):
+		return self.collectible and self.playable
 
 
 class CardTag(models.Model):
