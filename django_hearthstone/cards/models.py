@@ -40,6 +40,9 @@ class Card(models.Model):
 	race = IntEnumField(enum=enums.Race, default=enums.Race.INVALID)
 	rarity = IntEnumField(enum=enums.Rarity, default=enums.Rarity.INVALID)
 	type = IntEnumField(enum=enums.CardType, default=enums.CardType.INVALID)
+	multi_class_group = IntEnumField(
+		enum=enums.MultiClassGroup, default=enums.MultiClassGroup.INVALID,
+	)
 
 	collectible = models.BooleanField(default=False)
 	battlecry = models.BooleanField(default=False)
