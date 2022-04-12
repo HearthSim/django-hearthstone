@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from hearthstone import cardxml
 from hearthstone.enums import Locale
 
@@ -11,6 +11,10 @@ class Command(BaseCommand):
 		parser.add_argument("path", nargs="?", help="CardDefs.xml file")
 		parser.add_argument("--locale", default="enUS")
 		parser.add_argument("--force", action="store_true", help="Force update all cards")
+		parser.add_argument(
+			"--ignore-conflicts", action="store_true",
+			help="Ignore conflicts due to existing cards"
+		)
 
 	def handle(self, *args, **options):
 		path = options["path"]
@@ -31,12 +35,22 @@ class Command(BaseCommand):
 			for card in existing:
 				if card.dbf_id not in db:
 					self.stderr.write(
-						"WARNING: %r (%s) not in CardDefs.xml. Skipping." % (card, card.dbf_id)
+						f"WARNING: {repr(card)} ({card.dbf_id}) not in CardDefs.xml. "
+						"Skipping."
 					)
 					continue
 				c = db[card.dbf_id]
 				if c:
-					card.update_from_cardxml(c, save=True)
+					try:
+						card.update_from_cardxml(c, save=True)
+					except IntegrityError as e:
+						if options["ignore_conflicts"]:
+							self.stderr.write(
+								f"WARNING: Ignoring {repr(card)} ({card.dbf_id}) conflict:"
+								f"{e}"
+							)
+						else:
+							raise e
 			self.stdout.write("%i updated cards" % (len(existing)))
 
 		tags = []
