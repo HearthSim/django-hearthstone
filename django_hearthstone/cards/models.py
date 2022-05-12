@@ -149,6 +149,7 @@ class Card(models.Model):
 
 
 class CardTag(models.Model):
+	id = models.AutoField(primary_key=True, serialize=False, verbose_name="ID")
 	card = models.ForeignKey(
 		"Card", to_field="dbf_id", db_column="card_dbf_id", related_name="tags",
 		on_delete=models.CASCADE
@@ -161,6 +162,7 @@ class CardTag(models.Model):
 
 
 class CardString(models.Model):
+	id = models.AutoField(primary_key=True, serialize=False, verbose_name="ID")
 	card = models.ForeignKey(
 		"Card", to_field="dbf_id", db_column="card_dbf_id", related_name="strings",
 		on_delete=models.CASCADE
