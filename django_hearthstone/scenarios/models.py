@@ -13,6 +13,7 @@ class AdventureMode(IntEnum):
 
 
 class Adventure(models.Model):
+	id = models.AutoField(primary_key=True, serialize=False, verbose_name="ID")
 	note_desc = models.CharField(max_length=64)
 	name = models.CharField(max_length=64)
 	sort_order = models.PositiveIntegerField(default=0)
@@ -29,6 +30,7 @@ class Adventure(models.Model):
 
 
 class Wing(models.Model):
+	id = models.AutoField(primary_key=True, serialize=False, verbose_name="ID")
 	note_desc = models.CharField(max_length=64)
 	adventure = models.ForeignKey(Adventure, on_delete=models.PROTECT)
 	sort_order = models.PositiveIntegerField()
@@ -53,6 +55,7 @@ class Wing(models.Model):
 
 
 class Scenario(models.Model):
+	id = models.AutoField(primary_key=True, serialize=False, verbose_name="ID")
 	note_desc = models.CharField(max_length=64)
 	players = models.PositiveSmallIntegerField()
 	player1_hero_card_id = models.IntegerField(null=True)
