@@ -15,7 +15,8 @@ class IncludibleCardManager(models.Manager):
 			models.Q(type__in=[
 				enums.CardType.MINION,
 				enums.CardType.SPELL,
-				enums.CardType.WEAPON
+				enums.CardType.WEAPON,
+				enums.CardType.LOCATION,
 			]) | (
 				models.Q(type=enums.CardType.HERO) &
 				~models.Q(card_set__in=[enums.CardSet.CORE, enums.CardSet.HERO_SKINS])
@@ -136,7 +137,12 @@ class Card(models.Model):
 	@property
 	def playable(self):
 		"""Returns whether the card can be played."""
-		if self.type in [enums.CardType.MINION, enums.CardType.SPELL, enums.CardType.WEAPON]:
+		if self.type in [
+			enums.CardType.MINION,
+			enums.CardType.SPELL,
+			enums.CardType.WEAPON,
+			enums.CardType.LOCATION,
+		]:
 			return True
 		# Heroes can only be played if they are not the basic heroes or hero skins.
 		if self.type == enums.CardType.HERO:
