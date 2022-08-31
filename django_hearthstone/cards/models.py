@@ -109,9 +109,12 @@ class Card(models.Model):
 	def get_card_art_url(self, resolution=256, format="jpg"):
 		return "https://art.hearthstonejson.com/v1/%ix/%s.%s" % (resolution, self.id, format)
 
-	def get_card_render_url(self, resolution=256, format="png", locale="enUS", build="latest"):
-		return "https://art.hearthstonejson.com/v1/render/%s/%s/%ix/%s.%s" % (
-			build, locale, resolution, self.id, format
+	def get_card_render_url(
+		self, resolution=256, format="png", locale="enUS", build="latest",
+		type="render",
+	):
+		return "https://art.hearthstonejson.com/v1/%s/%s/%s/%ix/%s.%s" % (
+			type, build, locale, resolution, self.id, format
 		)
 
 	def get_tile_url(self, format="png"):
