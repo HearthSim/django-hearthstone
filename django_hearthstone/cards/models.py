@@ -1,8 +1,11 @@
+from typing import Literal, Optional, Union
+
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django_intenum import IntEnumField
 from hearthstone import cardxml, enums
+from hearthstone.enums import Locale
 
 
 DBF_DB = {}
@@ -106,21 +109,38 @@ class Card(models.Model):
 		# XXX
 		return reverse("card_detail", kwargs={"pk": self.dbf_id, "slug": self.slug})
 
-	def get_card_art_url(self, resolution=256, format="jpg"):
+	def get_card_art_url(
+		self,
+		resolution: Literal[128, 256, 512] = 512,
+		format: str = "jpg",
+	) -> str:
 		return "https://art.hearthstonejson.com/v1/%ix/%s.%s" % (resolution, self.id, format)
 
 	def get_card_render_url(
-		self, resolution=256, format="png", locale="enUS", build="latest",
-		type="render",
-	):
+		self,
+		resolution: Literal[128, 256, 512] = 512,
+		format: str = "png",
+		locale: Optional[Union[str, Locale]] = "enUS",
+		build: str = "latest", type: str = "render",
+	) -> str:
+		if locale is None:
+			# Not everything is translated
+			return "https://art.hearthstonejson.com/v1/%s/%s/%ix/%s.%s" % (
+				type, build, resolution, self.id, format
+			)
+		if isinstance(locale, Locale):
+			locale = locale.name
 		return "https://art.hearthstonejson.com/v1/%s/%s/%s/%ix/%s.%s" % (
 			type, build, locale, resolution, self.id, format
 		)
 
-	def get_tile_url(self, format="png"):
+	def get_tile_url(
+		self,
+		format: str = "png",
+	) -> str:
 		return "https://art.hearthstonejson.com/v1/tiles/%s.%s" % (self.id, format)
 
-	def localized_name(self, locale) -> str:
+	def localized_name(self, locale: Locale) -> str:
 		try:
 			return self.strings.get(locale=locale, game_tag=enums.GameTag.CARDNAME).value
 		except CardString.DoesNotExist:
