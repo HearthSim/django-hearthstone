@@ -7,8 +7,9 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     strategy:
-        matrix:
-            toxenv: [django32, django40, django41, django42, djangomain, flake8]
+      matrix:
+        toxenv: [django32, django40, django41, django42, djangomain, flake8]
+      fail-fast: false
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9
@@ -21,15 +22,15 @@ jobs:
         pip install tox
     - name: Run tox
       env:
-          TOXENV: ${{ matrix.toxenv }}
+        TOXENV: ${{ matrix.toxenv }}
       run: tox
   release:
     name: Release
     needs: [test]
     runs-on: ubuntu-latest
     permissions:
-        # required to authenticate for the PyPi upload below
-        id-token: write
+      # required to authenticate for the PyPi upload below
+      id-token: write
     if: startsWith(github.ref, 'refs/tags')
     steps:
       - uses: actions/checkout@v3
