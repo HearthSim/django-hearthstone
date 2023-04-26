@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-            toxenv: [django22, django31, django32, djangomain, flake8]
+            toxenv: [django32, django40, django41, django42, djangomain, flake8]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9
