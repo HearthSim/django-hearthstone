@@ -1,7 +1,7 @@
 import pytest
 from django.core.management import call_command
 from hearthstone.cardxml import load_dbf
-from hearthstone.enums import Locale
+from hearthstone.enums import CardClass, Locale
 
 from django_hearthstone.cards.models import Card
 
@@ -24,3 +24,29 @@ def test_load_cards():
 
 	assert {o.game_tag: o.value for o in wisp.tags.all()} == db[179].tags
 	assert wisp.strings.all().count() >= 28
+
+
+class TestCard:
+	@pytest.mark.django_db
+	def test_classes(self):
+		assert Card.objects.create(
+			dbf_id=179, card_id="CS2_231", name="Wisp", card_class=CardClass.NEUTRAL
+		).classes == [CardClass.NEUTRAL]
+
+		# Gadgetzan
+		assert Card.objects.create(
+			dbf_id=40408, card_id="CFM_621", name="Kazakus", card_class=CardClass.NEUTRAL,
+			multiple_classes=296,
+		).classes == [CardClass.MAGE, CardClass.PRIEST, CardClass.WARLOCK]
+
+		# Scholomance
+		assert Card.objects.create(
+			dbf_id=59726, card_id="SCH_702", name="Felosophy", card_class=CardClass.WARLOCK,
+			multiple_classes=8448,
+		).classes == [CardClass.WARLOCK, CardClass.DEMONHUNTER]
+
+		# Audiopocalypse
+		assert Card.objects.create(
+			dbf_id=98377, card_id="JAM_022", name="Deafen", card_class=CardClass.PRIEST,
+			multiple_classes=96,
+		).classes == [CardClass.PRIEST, CardClass.ROGUE]

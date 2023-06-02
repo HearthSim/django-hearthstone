@@ -1,4 +1,4 @@
-from typing import Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from django.db import models
 from django.urls import reverse
@@ -47,6 +47,7 @@ class Card(models.Model):
 	multi_class_group = IntEnumField(
 		enum=enums.MultiClassGroup, default=enums.MultiClassGroup.INVALID,
 	)
+	multiple_classes = models.IntegerField(default=0)
 
 	collectible = models.BooleanField(default=False)
 	battlecry = models.BooleanField(default=False)
@@ -148,7 +149,7 @@ class Card(models.Model):
 
 	def update_from_cardxml(self, cardxml, save=False):
 		for k in dir(cardxml):
-			if k.startswith("_") or k in ("id", "tags", "strings"):
+			if k.startswith("_") or k in ("id", "tags", "strings", "classes"):
 				continue
 			# Transfer all existing CardXML attributes to our model
 			if hasattr(self, k):
@@ -175,6 +176,23 @@ class Card(models.Model):
 	@property
 	def includible(self):
 		return self.collectible and self.playable
+
+	@property
+	def classes(self) -> List[enums.CardClass]:
+		if not self.multiple_classes:
+			return [self.card_class]
+
+		retval = []
+		remainder = int(self.multiple_classes)
+		i = 1
+		while remainder != 0:
+			if remainder & 1 == 1:
+				retval.append(enums.CardClass(i))
+
+			remainder >>= 1
+			i += 1
+
+		return retval
 
 
 class CardTag(models.Model):
