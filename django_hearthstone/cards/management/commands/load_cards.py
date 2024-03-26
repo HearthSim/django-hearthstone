@@ -10,10 +10,13 @@ class Command(BaseCommand):
 	def add_arguments(self, parser):
 		parser.add_argument("path", nargs="?", help="CardDefs.xml file")
 		parser.add_argument("--locale", default="enUS")
-		parser.add_argument("--force", action="store_true", help="Force update all cards")
 		parser.add_argument(
-			"--ignore-conflicts", action="store_true",
-			help="Ignore conflicts due to existing cards"
+			"--no-update", action="store_true",
+			help="Skip updating existing cards"
+		)
+		parser.add_argument(
+			"--force", action="store_true",
+			help="Bypass conflicts with existing cards"
 		)
 
 	def handle(self, *args, **options):
@@ -30,7 +33,7 @@ class Command(BaseCommand):
 		Card.objects.bulk_create(new_cards)
 		self.stdout.write("%i new cards" % (len(new_cards)))
 
-		if options["force"]:
+		if not options["no_update"]:
 			existing = Card.objects.filter(dbf_id__in=known_ids)
 			for card in existing:
 				if card.dbf_id not in db:
@@ -44,7 +47,7 @@ class Command(BaseCommand):
 					try:
 						card.update_from_cardxml(c, save=True)
 					except IntegrityError as e:
-						if options["ignore_conflicts"]:
+						if options["force"]:
 							self.stderr.write(
 								f"WARNING: Ignoring {repr(card)} ({card.dbf_id}) conflict:"
 								f"{e}"
