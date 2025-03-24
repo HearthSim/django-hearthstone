@@ -205,7 +205,10 @@ class CardTag(models.Model):
 	value = models.PositiveIntegerField()
 
 	def __str__(self):
-		return f"{str(self.card)}.{self.game_tag.name}={str(self.value)}"
+		game_tag_name = (
+			self.game_tag.name if hasattr(self.game_tag, "name") else str(self.game_tag)
+		)
+		return f"{str(self.card)}.{game_tag_name}={self.value}"
 
 
 class CardString(models.Model):
