@@ -76,6 +76,9 @@ class Card(models.Model):
 
 	craftable = models.BooleanField(default=False)
 
+	fabled = models.BooleanField(default=False)
+	is_fabled_bundle_card = models.BooleanField(default=False)
+
 	objects = models.Manager()
 	includibles = IncludibleCardManager()
 

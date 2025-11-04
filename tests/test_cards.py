@@ -24,6 +24,22 @@ def test_load_cards():
 
 	assert {o.game_tag: o.value for o in wisp.tags.all()} == db[179].tags
 	assert wisp.strings.all().count() >= 28
+	assert not wisp.fabled
+	assert not wisp.is_fabled_bundle_card
+
+	alleria = Card.objects.get(dbf_id=119705)
+	assert alleria.dbf_id == 119705
+	assert alleria.card_id == "TIME_609t1"
+	assert alleria.name == "Ranger Captain Alleria"
+	assert not alleria.fabled
+	assert alleria.is_fabled_bundle_card
+
+	sylvanas = Card.objects.get(dbf_id=119707)
+	assert sylvanas.dbf_id == 119707
+	assert sylvanas.card_id == "TIME_609"
+	assert sylvanas.name == "Ranger General Sylvanas"
+	assert sylvanas.fabled
+	assert not sylvanas.is_fabled_bundle_card
 
 
 class TestCard:
