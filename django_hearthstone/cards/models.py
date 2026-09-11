@@ -145,10 +145,14 @@ class Card(models.Model):
 		return "https://art.hearthstonejson.com/v1/tiles/%s.%s" % (self.id, format)
 
 	def localized_name(self, locale: Locale) -> str:
-		try:
-			return self.strings.get(locale=locale, game_tag=enums.GameTag.CARDNAME).value
-		except CardString.DoesNotExist:
-			return ""
+		# Cache every locale, as callers usually ask for more than one
+		if not hasattr(self, "_localized_names"):
+			self._localized_names = {
+				string.locale: string.value
+				for string in self.strings.filter(game_tag=enums.GameTag.CARDNAME)
+			}
+
+		return self._localized_names.get(locale, "")
 
 	def update_from_cardxml(self, cardxml, save=False):
 		for k in dir(cardxml):
